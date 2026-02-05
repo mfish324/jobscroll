@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ExperienceLevel {
+  ENTRY
+  MID
+  SENIOR
+  EXECUTIVE
+}
+
+model JobListing {
+  id              String   @id @default(cuid())
+
+  // Basic Info
+  title           String
+  company         String
+  companyLogo     String?
+  location        String?
+  jobType         String?
+  experienceLevel ExperienceLevel?
+  category        String   @default("tech")
+
+  // Details
+  description     String   @db.Text
+  requirements    String?  @db.Text
+  benefits        String?  @db.Text
+  salaryMin       Int?
+  salaryMax       Int?
+  salaryCurrency  String?  @default("USD")
+  salaryPeriod    String?  @default("yearly")
+
+  // Metadata
+  skills          String[] @default([])
+  remote          Boolean  @default(false)
+  country         String?  @default("US")
+  applyUrl        String?
+  companyWebsite  String?
+
+  // Source tracking
+  source          String
+  sourceId        String?
+  sourceUrl       String?
+  publisher       String?
+
+  // XP calculation
+  difficultyLevel Int      @default(1)
+
+  // Multi-platform classification
+  audienceTags    String[] @default([])
+  classificationConfidence Float?
+
+  // RJRP verification
+  isRjrpVerified  Boolean  @default(false)
+  rjrpEmployerId  String?
+
+  // Status
+  isActive        Boolean  @default(true)
+  postedAt        DateTime @default(now())
+  expiresAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([source, sourceId])
+  @@index([isActive, postedAt])
+  @@index([isActive, category])
+  @@index([company])
+  @@index([skills])
+  @@index([audienceTags], type: Gin)
+  @@index([experienceLevel])
+  @@map("job_listings")
+}
