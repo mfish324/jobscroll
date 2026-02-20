@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { CheckCircle, MapPin, Briefcase, DollarSign, ExternalLink } from 'lucide-react'
+import { CheckCircle, MapPin, Briefcase, DollarSign } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { Job } from '@/lib/types'
+import { JobDetailModal } from '@/components/job-detail-modal'
 
 interface JobCardProps {
   job: Job
@@ -38,17 +40,24 @@ function formatExperienceLevel(level: string | null): string {
 }
 
 export function JobCard({ job }: JobCardProps) {
+  const [modalOpen, setModalOpen] = useState(false)
   const postedDate = formatDistanceToNow(new Date(job.postedAt), { addSuffix: true })
   const salary = formatSalary(job.salaryMin, job.salaryMax)
   const experienceLabel = formatExperienceLevel(job.experienceLevel)
 
   return (
-    <Card className="p-6 hover:shadow-md transition-shadow cursor-pointer group bg-white border-slate-200">
-      <a
-        href={job.applyUrl || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
+    <>
+      <Card
+        className="p-6 hover:shadow-md transition-shadow cursor-pointer group bg-white border-slate-200"
+        onClick={() => setModalOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setModalOpen(true)
+          }
+        }}
       >
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1 min-w-0">
@@ -108,11 +117,13 @@ export function JobCard({ job }: JobCardProps) {
         {/* Footer */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
           <span className="text-xs text-slate-400">{postedDate}</span>
-          <span className="text-xs text-teal-600 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            View job <ExternalLink className="h-3 w-3" />
+          <span className="text-xs text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity">
+            View details
           </span>
         </div>
-      </a>
-    </Card>
+      </Card>
+
+      <JobDetailModal job={job} open={modalOpen} onOpenChange={setModalOpen} />
+    </>
   )
 }

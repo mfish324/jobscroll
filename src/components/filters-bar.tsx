@@ -27,6 +27,9 @@ export function FiltersBar() {
   const remoteOnly = searchParams.get('remote') === 'true'
   const salaryMin = searchParams.get('salaryMin') || ''
   const verifiedOnly = searchParams.get('verified') === 'true'
+  const activeLevels = new Set(
+    (searchParams.get('levels') || '').split(',').filter(Boolean)
+  )
 
   // Update URL with new params
   const updateFilters = useCallback((updates: Record<string, string | null>) => {
@@ -75,7 +78,17 @@ export function FiltersBar() {
     })
   }
 
-  const hasFilters = search || location || remoteOnly || salaryMin || verifiedOnly
+  const toggleLevel = (level: string) => {
+    const next = new Set(activeLevels)
+    if (next.has(level)) {
+      next.delete(level)
+    } else {
+      next.add(level)
+    }
+    updateFilters({ levels: next.size > 0 ? [...next].join(',') : null })
+  }
+
+  const hasFilters = search || location || remoteOnly || salaryMin || verifiedOnly || activeLevels.size > 0
 
   return (
     <div className="sticky top-0 z-10 bg-stone-50/95 backdrop-blur-sm border-b border-slate-200 py-4">
@@ -146,6 +159,26 @@ export function FiltersBar() {
               <CheckCircle className="h-3 w-3" />
               Verified only
             </Button>
+
+            {/* Experience level toggles */}
+            {(['MID', 'SENIOR', 'EXECUTIVE'] as const).map((level) => {
+              const active = activeLevels.has(level)
+              const labels: Record<string, string> = { MID: 'Mid', SENIOR: 'Senior', EXECUTIVE: 'Executive' }
+              return (
+                <Button
+                  key={level}
+                  variant={active ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => toggleLevel(level)}
+                  className={active
+                    ? 'bg-teal-600 hover:bg-teal-700 text-white'
+                    : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                  }
+                >
+                  {labels[level]}
+                </Button>
+              )
+            })}
 
             {/* Clear all */}
             {hasFilters && (

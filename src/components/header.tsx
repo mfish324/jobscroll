@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SettingsModal } from '@/components/settings-modal'
 
 export function Header() {
   return (
@@ -14,6 +15,7 @@ export function Header() {
           <Link href="/about" className="hover:text-slate-700 transition-colors">
             About
           </Link>
+          <SettingsModal />
         </nav>
       </div>
     </header>

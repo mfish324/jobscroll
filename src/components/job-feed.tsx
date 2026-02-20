@@ -103,7 +103,7 @@ export function JobFeed({ initialJobs, initialCursor, filters = {} }: JobFeedPro
       {/* End of feed message */}
       {!hasMore && jobs.length > 0 && (
         <div className="text-center py-8">
-          <p className="text-slate-400 text-sm">You've reached the end</p>
+          <p className="text-slate-400 text-sm">You&apos;ve reached the end</p>
         </div>
       )}
     </div>

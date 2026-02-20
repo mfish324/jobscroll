@@ -3,6 +3,17 @@ import { getJobScrollJobs, JobFilters } from '@/lib/queries/jobs'
 import { JobFeed } from '@/components/job-feed'
 import { FiltersBar } from '@/components/filters-bar'
 import { JobCardSkeleton } from '@/components/job-card-skeleton'
+import dynamic from 'next/dynamic'
+
+const IntakeModal = dynamic(
+  () => import('@/components/intake-modal').then(m => ({ default: m.IntakeModal })),
+  { ssr: false }
+)
+
+const PreferencesApplier = dynamic(
+  () => import('@/components/preferences-applier').then(m => ({ default: m.PreferencesApplier })),
+  { ssr: false }
+)
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -57,6 +68,9 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen">
+      <IntakeModal />
+      <PreferencesApplier />
+
       <Suspense fallback={null}>
         <FiltersBar />
       </Suspense>
